@@ -4,7 +4,7 @@
 
 ## پروژه‌های مرتبط
 - **فرانت‌اند (Next.js):** `C:\Users\m.hosseini\Desktop\111` — گیت‌هاب: https://github.com/mhosseini93/car
-- **بک‌اند (همین پروژه):** `C:\Users\m.hosseini\Desktop\car-backend`
+- **بک‌اند (همین پروژه):** `C:\Users\m.hosseini\Desktop\car-backend` — گیت‌هاب: https://github.com/mhosseini93/car-back
 
 ## قراردادها
 - NestJS 12 با ESM: importهای داخلی پسوند `.js` دارند (`./app.service.js`).
