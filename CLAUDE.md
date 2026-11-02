@@ -43,3 +43,8 @@
    `psql -U postgres -h localhost -v app_password=<رمز> -f scripts/create-db.sql`
 4. `npm run db:restore` تا داده‌ها از بکاپ برگردند.
 5. `npm run start:dev`
+
+## بلاگ
+- `src/blog/`: مقالات، دسته‌بندی‌ها (چند به چند)، مقالات مرتبط (دستی + تکمیل خودکار از همان دسته)، دیدگاه‌ها (نیاز به تأیید، honeypot، ۳ دیدگاه در دقیقه) و آپلود تصویر (`POST /api/admin/uploads`، در پوشه `uploads/` که در گیت است).
+- HTML مقاله هنگام ذخیره با `sanitize-html` پاک‌سازی می‌شود (`src/blog/content.ts`).
+- مسیرهای عمومی: `/api/blog/...`؛ مدیریتی: `/api/admin/...` (همه با `AdminGuard`).
