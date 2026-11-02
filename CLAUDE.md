@@ -10,9 +10,9 @@
 - NestJS 12 با ESM: importهای داخلی پسوند `.js` دارند (`./app.service.js`).
 - همه مسیرها زیر پیشوند `/api` هستند؛ پورت پیش‌فرض `4000` (فرانت‌اند روی `3000`).
 - تنظیمات با `@nestjs/config` از `.env` خوانده می‌شود؛ هر متغیر جدید را به `.env.example` هم اضافه کن.
-- تنظیمات مشترک اپ (prefix، CORS، ValidationPipe) در `src/setup.ts` است و هم در `main.ts` و هم در تست‌های e2e استفاده می‌شود.
+- تنظیمات اپ (prefix، CORS، ValidationPipe) در `src/setup.ts` است.
 - ورودی‌ها با DTO و `class-validator` اعتبارسنجی شوند (`whitelist` و `forbidNonWhitelisted` فعال است).
-- تست واحد با Vitest (`npm test`)، تست e2e با `npm run test:e2e`، lint با `npm run lint` (oxlint).
+- **تست ننویس.** هیچ فایل تست یا ابزار تست به این پروژه اضافه نکن (قانون مشترک با فرانت‌اند). درستی کار را با `npm run build`، `npm run lint` (oxlint) و اجرای واقعی API بررسی کن.
 
 ## اجرا
 - `npm run start:dev` → http://localhost:4000/api/health

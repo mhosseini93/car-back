@@ -1,7 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-// Shared by main.ts and the e2e tests so both run the same app configuration
+// Global app configuration: API prefix, CORS and request validation
 export function configureApp(app: INestApplication) {
   const config = app.get(ConfigService);
 
