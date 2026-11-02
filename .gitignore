@@ -21,3 +21,6 @@ npm-debug.log*
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# SQLite database
+/data
