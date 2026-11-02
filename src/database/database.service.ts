@@ -1,35 +1,31 @@
-import { mkdirSync } from 'node:fs';
-import { dirname } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
-import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { resolve } from 'node:path';
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import { Pool } from 'pg';
+import * as schema from './schema.js';
 
-// Thin wrapper around Node's built-in SQLite driver
+export type Database = NodePgDatabase<typeof schema>;
+
+// PostgreSQL connection pool + Drizzle ORM; applies pending migrations on startup
 @Injectable()
 export class DatabaseService implements OnModuleInit, OnModuleDestroy {
-  private db!: DatabaseSync;
+  private readonly logger = new Logger(DatabaseService.name);
+  private readonly pool: Pool;
+  readonly db: Database;
 
-  constructor(private readonly config: ConfigService) {}
-
-  onModuleInit() {
-    const path = this.config.get<string>('DATABASE_PATH', 'data/app.db');
-    if (path !== ':memory:') mkdirSync(dirname(path), { recursive: true });
-
-    this.db = new DatabaseSync(path);
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS settings (
-        key        TEXT PRIMARY KEY,
-        value      TEXT NOT NULL,
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-      )
-    `);
+  constructor(config: ConfigService) {
+    this.pool = new Pool({ connectionString: config.getOrThrow<string>('DATABASE_URL') });
+    this.db = drizzle(this.pool, { schema });
   }
 
-  onModuleDestroy() {
-    this.db.close();
+  async onModuleInit() {
+    await migrate(this.db, { migrationsFolder: resolve(process.cwd(), 'drizzle') });
+    this.logger.log('Database migrations are up to date');
   }
 
-  get connection(): DatabaseSync {
-    return this.db;
+  async onModuleDestroy() {
+    await this.pool.end();
   }
 }

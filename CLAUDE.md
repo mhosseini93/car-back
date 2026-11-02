@@ -18,7 +18,10 @@
 - `npm run start:dev` → http://localhost:4000/api/health
 
 ## ساختار
-- `src/database/` — اتصال SQLite با ماژول داخلی Node (`node:sqlite`)، مسیر فایل از `DATABASE_PATH` (پیش‌فرض `data/app.db`، خارج از گیت). جدول‌ها در `onModuleInit` ساخته می‌شوند.
+- `src/database/` — دیتابیس **PostgreSQL** (نسخه ۱۸، لوکال روی پورت 5432) با **Drizzle ORM** و درایور `pg`. اتصال از `DATABASE_URL`؛ دیتابیس `car` با کاربر `car_app`.
+  - جدول‌ها فقط در `src/database/schema.ts` تعریف می‌شوند. بعد از هر تغییر schema، `npm run db:generate -- --name <توضیح>` بزن تا مایگریشن در `drizzle/` ساخته شود و آن را کامیت کن. هیچ‌وقت جدول را دستی در دیتابیس تغییر نده.
+  - مایگریشن‌ها موقع روشن شدن سرور خودکار اجرا می‌شوند (`npm run db:migrate` هم هست). برای دیدن داده‌ها: `npm run db:studio`.
+  - ستون‌های `jsonb` ترتیب کلیدهای آبجکت را حفظ نمی‌کنند؛ مقایسه یا خروجی را به ترتیب کلید وابسته نکن.
 - `src/auth/` — ورود ادمین (`POST /api/auth/login`، محدود به ۵ تلاش در دقیقه) و `AdminGuard` برای مسیرهای مدیریتی. کاربر ادمین از `.env` خوانده می‌شود: `ADMIN_USERNAME` و `ADMIN_PASSWORD_HASH` (هش scrypt). توکن JWT با `JWT_SECRET` امضا می‌شود و ۸ ساعت اعتبار دارد.
 - `src/settings/` — تنظیمات عمومی سایت در جدول `settings` (key/value JSON). فعلاً: `GET /api/settings/footer` (عمومی) و `PUT /api/settings/footer` (فقط ادمین).
 - هر endpoint مدیریتی جدید باید `@UseGuards(AdminGuard)` داشته باشد. پیام‌های خطای اعتبارسنجی فارسی باشند چون مستقیم در پنل نمایش داده می‌شوند.

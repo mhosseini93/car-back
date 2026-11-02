@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
+import { eq, sql } from 'drizzle-orm';
 import { DatabaseService } from '../database/database.service.js';
+import { settings } from '../database/schema.js';
 import type { FooterSettingsDto } from './footer-settings.dto.js';
 
 export type FooterSettings = {
@@ -36,32 +38,32 @@ const FOOTER_KEY = 'footer';
 export class SettingsService {
   constructor(private readonly database: DatabaseService) {}
 
-  getFooter(): FooterSettings {
-    const row = this.database.connection
-      .prepare('SELECT value, updated_at FROM settings WHERE key = ?')
-      .get(FOOTER_KEY) as { value: string; updated_at: string } | undefined;
+  async getFooter(): Promise<FooterSettings> {
+    const [row] = await this.database.db
+      .select()
+      .from(settings)
+      .where(eq(settings.key, FOOTER_KEY))
+      .limit(1);
 
     if (!row) return { columns: DEFAULT_FOOTER, updatedAt: null };
     return {
-      columns: (JSON.parse(row.value) as Pick<FooterSettings, 'columns'>).columns,
-      updatedAt: row.updated_at,
+      columns: (row.value as Pick<FooterSettings, 'columns'>).columns,
+      updatedAt: row.updatedAt.toISOString(),
     };
   }
 
-  updateFooter(dto: FooterSettingsDto): FooterSettings {
-    const value = JSON.stringify({
+  async updateFooter(dto: FooterSettingsDto): Promise<FooterSettings> {
+    const value = {
       columns: dto.columns.map(({ title, links }) => ({
         title,
         links: links.map(({ label, href }) => ({ label, href })),
       })),
-    });
+    };
 
-    this.database.connection
-      .prepare(
-        `INSERT INTO settings (key, value, updated_at) VALUES (?, ?, datetime('now'))
-         ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
-      )
-      .run(FOOTER_KEY, value);
+    await this.database.db
+      .insert(settings)
+      .values({ key: FOOTER_KEY, value })
+      .onConflictDoUpdate({ target: settings.key, set: { value, updatedAt: sql`now()` } });
 
     return this.getFooter();
   }
