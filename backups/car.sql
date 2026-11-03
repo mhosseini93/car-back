@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict mUqhVrJ93NU8MQO2iywpkWqgBGAJcexqnaZu9Kv9XlgDuZJTpb7LjcFI05GAnu7
+\restrict n6hZhyr17Kh74q641vAk5TuSgNnRj6CXqfd4Ve2BfQL8nF2xbanRrWaZdeVMt4I
 
 -- Dumped from database version 18.6
 -- Dumped by pg_dump version 18.6
@@ -24,8 +24,10 @@ ALTER TABLE IF EXISTS ONLY public.post_related DROP CONSTRAINT IF EXISTS post_re
 ALTER TABLE IF EXISTS ONLY public.post_categories DROP CONSTRAINT IF EXISTS post_categories_post_id_posts_id_fk;
 ALTER TABLE IF EXISTS ONLY public.post_categories DROP CONSTRAINT IF EXISTS post_categories_category_id_categories_id_fk;
 ALTER TABLE IF EXISTS ONLY public.comments DROP CONSTRAINT IF EXISTS comments_post_id_posts_id_fk;
+ALTER TABLE IF EXISTS ONLY public.cars DROP CONSTRAINT IF EXISTS cars_brand_id_brands_id_fk;
 DROP INDEX IF EXISTS public.posts_status_published_at_idx;
 DROP INDEX IF EXISTS public.comments_post_status_idx;
+DROP INDEX IF EXISTS public.cars_brand_idx;
 ALTER TABLE IF EXISTS ONLY public.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY public.posts DROP CONSTRAINT IF EXISTS posts_slug_unique;
 ALTER TABLE IF EXISTS ONLY public.posts DROP CONSTRAINT IF EXISTS posts_pkey;
@@ -34,10 +36,16 @@ ALTER TABLE IF EXISTS ONLY public.post_categories DROP CONSTRAINT IF EXISTS post
 ALTER TABLE IF EXISTS ONLY public.comments DROP CONSTRAINT IF EXISTS comments_pkey;
 ALTER TABLE IF EXISTS ONLY public.categories DROP CONSTRAINT IF EXISTS categories_slug_unique;
 ALTER TABLE IF EXISTS ONLY public.categories DROP CONSTRAINT IF EXISTS categories_pkey;
+ALTER TABLE IF EXISTS ONLY public.cars DROP CONSTRAINT IF EXISTS cars_slug_unique;
+ALTER TABLE IF EXISTS ONLY public.cars DROP CONSTRAINT IF EXISTS cars_pkey;
+ALTER TABLE IF EXISTS ONLY public.brands DROP CONSTRAINT IF EXISTS brands_slug_unique;
+ALTER TABLE IF EXISTS ONLY public.brands DROP CONSTRAINT IF EXISTS brands_pkey;
 ALTER TABLE IF EXISTS ONLY drizzle.__drizzle_migrations DROP CONSTRAINT IF EXISTS __drizzle_migrations_pkey;
 ALTER TABLE IF EXISTS public.posts ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.comments ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS public.categories ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.cars ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS public.brands ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS drizzle.__drizzle_migrations ALTER COLUMN id DROP DEFAULT;
 DROP TABLE IF EXISTS public.settings;
 DROP SEQUENCE IF EXISTS public.posts_id_seq;
@@ -48,16 +56,31 @@ DROP SEQUENCE IF EXISTS public.comments_id_seq;
 DROP TABLE IF EXISTS public.comments;
 DROP SEQUENCE IF EXISTS public.categories_id_seq;
 DROP TABLE IF EXISTS public.categories;
+DROP SEQUENCE IF EXISTS public.cars_id_seq;
+DROP TABLE IF EXISTS public.cars;
+DROP SEQUENCE IF EXISTS public.brands_id_seq;
+DROP TABLE IF EXISTS public.brands;
 DROP SEQUENCE IF EXISTS drizzle.__drizzle_migrations_id_seq;
 DROP TABLE IF EXISTS drizzle.__drizzle_migrations;
 DROP TYPE IF EXISTS public.post_status;
 DROP TYPE IF EXISTS public.comment_status;
+DROP TYPE IF EXISTS public.car_condition;
 DROP SCHEMA IF EXISTS drizzle;
 --
 -- Name: drizzle; Type: SCHEMA; Schema: -; Owner: -
 --
 
 CREATE SCHEMA drizzle;
+
+
+--
+-- Name: car_condition; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.car_condition AS ENUM (
+    'new',
+    'used'
+);
 
 
 --
@@ -114,6 +137,99 @@ CREATE SEQUENCE drizzle.__drizzle_migrations_id_seq
 --
 
 ALTER SEQUENCE drizzle.__drizzle_migrations_id_seq OWNED BY drizzle.__drizzle_migrations.id;
+
+
+--
+-- Name: brands; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.brands (
+    id integer NOT NULL,
+    slug text NOT NULL,
+    name text NOT NULL,
+    english_name text DEFAULT ''::text NOT NULL,
+    intro text DEFAULT ''::text NOT NULL,
+    content text DEFAULT ''::text NOT NULL,
+    logo_url text,
+    color text DEFAULT '#1d4ed8'::text NOT NULL,
+    faqs jsonb DEFAULT '[]'::jsonb NOT NULL,
+    meta_title text DEFAULT ''::text NOT NULL,
+    meta_description text DEFAULT ''::text NOT NULL,
+    robots_index boolean DEFAULT true NOT NULL,
+    robots_follow boolean DEFAULT true NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    "position" integer DEFAULT 0 NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: brands_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.brands_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: brands_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.brands_id_seq OWNED BY public.brands.id;
+
+
+--
+-- Name: cars; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.cars (
+    id integer NOT NULL,
+    slug text NOT NULL,
+    brand_id integer NOT NULL,
+    name text NOT NULL,
+    year integer NOT NULL,
+    condition public.car_condition DEFAULT 'new'::public.car_condition NOT NULL,
+    mileage integer DEFAULT 0 NOT NULL,
+    price bigint NOT NULL,
+    min_down_percent integer DEFAULT 30 NOT NULL,
+    gearbox text DEFAULT 'اتوماتیک'::text NOT NULL,
+    fuel text DEFAULT 'بنزین'::text NOT NULL,
+    color text DEFAULT '#e5e7eb'::text NOT NULL,
+    image_url text,
+    image_alt text DEFAULT ''::text NOT NULL,
+    tags text[] DEFAULT '{}'::text[] NOT NULL,
+    weekly_views integer DEFAULT 0 NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    "position" integer DEFAULT 0 NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: cars_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.cars_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: cars_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.cars_id_seq OWNED BY public.cars.id;
 
 
 --
@@ -270,6 +386,20 @@ ALTER TABLE ONLY drizzle.__drizzle_migrations ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: brands id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.brands ALTER COLUMN id SET DEFAULT nextval('public.brands_id_seq'::regclass);
+
+
+--
+-- Name: cars id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cars ALTER COLUMN id SET DEFAULT nextval('public.cars_id_seq'::regclass);
+
+
+--
 -- Name: categories id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -297,6 +427,45 @@ ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_
 COPY drizzle.__drizzle_migrations (id, hash, created_at) FROM stdin;
 1	ff19c800accfa555dd98df593ddcf1e5ce773e0e7fa12ef8baef7e49297f66a6	1793635099508
 2	6c582484c7900e75108bd12506a134fceef37e770b2104de0ac2b539d9c861fa	1793638080455
+3	4542425120173f483672c74c3321d8ce78af517f91b41587831729dbc24eeea1	1793698738188
+4	13063c21a09d325cad98dc0226f872fa7dad462b9946928d4b4ea662ecbc9f1c	1793698739677
+\.
+
+
+--
+-- Data for Name: brands; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.brands (id, slug, name, english_name, intro, content, logo_url, color, faqs, meta_title, meta_description, robots_index, robots_follow, is_active, "position", created_at, updated_at) FROM stdin;
+1	iran-khodro	ایران‌خودرو	Iran Khodro	خرید اقساطی محصولات ایران‌خودرو مثل پژو ۲۰۷، تارا و دنا پلاس با پیش‌پرداخت کم و تحویل سریع.	<h2>چرا خرید اقساطی ایران‌خودرو؟</h2><p>ایران‌خودرو بزرگ‌ترین خودروساز کشور است و قطعات و خدمات پس از فروش محصولاتش در همه شهرها در دسترس است. همین موضوع باعث می‌شود خودروهای این برند ارزش خود را در بازار خوب حفظ کنند و برای خرید اقساطی گزینه‌ای مطمئن باشند.</p><p>در خودرو قسطی می‌توانید محصولات ایران‌خودرو را بدون ضامن، فقط با چک صیادی و با بازپرداخت ۱۲ تا ۴۸ ماهه خریداری کنید.</p>	\N	#1d4ed8	[]			t	t	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+3	modiran-khodro	مدیران‌خودرو	Modiran Khodro	خرید اقساطی شاسی‌بلندها و سواری‌های مدیران‌خودرو با شرایط شفاف و پیش‌پرداخت مناسب.	<h2>خرید اقساطی محصولات مدیران‌خودرو</h2><p>مدیران‌خودرو با محصولات ام‌وی‌ام، به‌ویژه شاسی‌بلندهای خانواده X، سهم بزرگی از بازار خودروهای مونتاژی دارد. این خودروها را می‌توانید با اقساط ثابت ماهانه و سند به نام خودتان خریداری کنید.</p>	\N	#b91c1c	[]			t	t	t	3	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+4	kerman-motor	کرمان موتور	Kerman Motor	خرید اقساطی محصولات کرمان موتور با بازپرداخت منعطف و سند به نام خریدار از روز اول.	<h2>خرید اقساطی کرمان موتور</h2><p>کرمان موتور با محصولات کی‌ام‌سی، از شاسی‌بلند تا وانت، گزینه‌های متنوعی برای خانواده‌ها و کسب‌وکارها دارد. شرایط اقساطی این برند با بازپرداخت منعطف و بدون نیاز به ضامن ارائه می‌شود.</p>	\N	#7c3aed	[]			t	t	t	4	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+5	fownix	فونیکس	Fownix	خرید اقساطی خودروهای فونیکس، از سواری تا شاسی‌بلند، با تحویل فوری مدل‌های موجود.	<h2>خرید اقساطی فونیکس با تحویل فوری</h2><p>فونیکس، برند محصولات چری در گروه مدیران‌خودرو، با خودروهایی مثل تیگو ۷ پرو و آریزو ۶ پرو شناخته می‌شود. مدل‌های موجود فونیکس با تحویل فوری و اقساط تا ۴۸ ماه عرضه می‌شوند.</p>	\N	#c2410c	[]			t	t	t	5	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+6	bahman-motor	بهمن موتور	Bahman Motor	خرید اقساطی محصولات بهمن موتور با پیش‌پرداخت از ۳۰ درصد و اقساط ثابت ماهانه.	<h2>خرید اقساطی بهمن موتور</h2><p>بهمن موتور با محصولات بسترن، از جمله فیدلیتی و دیگنیتی، در بازار شاسی‌بلندها و سواری‌های خانوادگی حضور دارد. این خودروها را با پیش‌پرداخت از ۳۰ درصد و اقساط ثابت ماهانه بخرید.</p>	\N	#0369a1	[]			t	t	t	6	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+2	saipa	سایپا	Saipa	خرید اقساطی خودروهای سایپا مثل شاهین و کوییک، صفر و کارکرده، بدون ضامن و با اقساط تا ۴۸ ماه.	<h2>خرید اقساطی سایپا با پیش‌پرداخت کم</h2><p>محصولات سایپا به دلیل قیمت مناسب و هزینه نگهداری پایین، از پرطرفدارترین گزینه‌ها برای خرید اقساطی هستند. پیش‌پرداخت خودروهای سایپا از ۲۵ درصد قیمت شروع می‌شود.</p><p>علاوه بر خودروهای صفر، خودروهای کارکرده کارشناسی‌شده سایپا هم با شرایط اقساطی عرضه می‌شوند.</p>	\N	#0f766e	[]			t	t	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:20:43.211+03:30
+\.
+
+
+--
+-- Data for Name: cars; Type: TABLE DATA; Schema: public; Owner: -
+--
+
+COPY public.cars (id, slug, brand_id, name, year, condition, mileage, price, min_down_percent, gearbox, fuel, color, image_url, image_alt, tags, weekly_views, is_active, "position", created_at, updated_at) FROM stdin;
+1	haima-s7-turbo	1	هایما S7 توربو	1404	used	12000	2400000000	40	اتوماتیک	بنزین	#64748b	\N		{شاسی‌بلند}	6100	t	4	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+2	dena-plus-turbo	1	دنا پلاس توربو	1405	new	0	1550000000	30	اتوماتیک	بنزین	#111827	\N		{"تحویل ۷ روزه"}	9800	t	3	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+3	tara-at	1	تارا اتوماتیک	1405	new	0	1650000000	30	اتوماتیک	بنزین	#1e3a8a	\N		{پرفروش}	15900	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+4	peugeot-207-at	1	پژو ۲۰۷ اتوماتیک	1405	new	0	1450000000	30	اتوماتیک	بنزین	#e5e7eb	\N		{"تحویل فوری"}	18400	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+5	quick-r	2	کوییک R	1403	used	25000	780000000	35	دستی	بنزین	#f8fafc	\N		{کارشناسی‌شده}	7300	t	3	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+6	saina-s	2	ساینا S	1405	new	0	820000000	25	دستی	بنزین	#f8fafc	\N		{اقتصادی}	5400	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+7	shahin-g	2	شاهین G	1405	new	0	1100000000	25	دستی	بنزین	#b91c1c	\N		{اقتصادی}	13200	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+8	mvm-315-plus	3	ام‌وی‌ام ۳۱۵ پلاس	1404	used	18000	1350000000	35	دستی	بنزین	#0f172a	\N		{کارشناسی‌شده}	4200	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+9	mvm-x55-pro	3	ام‌وی‌ام X55 پرو	1405	new	0	2850000000	35	اتوماتیک	بنزین	#f1f5f9	\N		{شاسی‌بلند}	14700	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+10	kmc-t8	4	کی‌ام‌سی T8	1405	new	0	3900000000	40	اتوماتیک	بنزین	#e2e8f0	\N		{وانت}	3900	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+11	kmc-j7	4	کی‌ام‌سی J7	1405	new	0	2650000000	35	اتوماتیک	بنزین	#334155	\N		{شاسی‌بلند}	11500	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+12	arrizo-6-pro	5	آریزو ۶ پرو	1405	new	0	2200000000	35	اتوماتیک	بنزین	#1e293b	\N		{سدان}	6800	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+13	tiggo-7-pro	5	تیگو ۷ پرو	1405	new	0	3100000000	40	اتوماتیک	بنزین	#7f1d1d	\N		{"تحویل فوری"}	12800	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+14	dignity-prestige	6	دیگنیتی پرستیژ	1405	new	0	3700000000	40	اتوماتیک	بنزین	#111827	\N		{شاسی‌بلند}	5100	t	2	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
+15	fidelity-prime	6	فیدلیتی پرایم	1405	new	0	3400000000	40	اتوماتیک	بنزین	#e2e8f0	\N		{"۷ نفره"}	8900	t	1	2026-11-03 13:10:05.76767+03:30	2026-11-03 13:10:05.76767+03:30
 \.
 
 
@@ -357,7 +526,21 @@ COPY public.settings (key, value, updated_at) FROM stdin;
 -- Name: __drizzle_migrations_id_seq; Type: SEQUENCE SET; Schema: drizzle; Owner: -
 --
 
-SELECT pg_catalog.setval('drizzle.__drizzle_migrations_id_seq', 2, true);
+SELECT pg_catalog.setval('drizzle.__drizzle_migrations_id_seq', 4, true);
+
+
+--
+-- Name: brands_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.brands_id_seq', 6, true);
+
+
+--
+-- Name: cars_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
+--
+
+SELECT pg_catalog.setval('public.cars_id_seq', 16, true);
 
 
 --
@@ -387,6 +570,38 @@ SELECT pg_catalog.setval('public.posts_id_seq', 6, true);
 
 ALTER TABLE ONLY drizzle.__drizzle_migrations
     ADD CONSTRAINT __drizzle_migrations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: brands brands_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.brands
+    ADD CONSTRAINT brands_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: brands brands_slug_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.brands
+    ADD CONSTRAINT brands_slug_unique UNIQUE (slug);
+
+
+--
+-- Name: cars cars_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cars
+    ADD CONSTRAINT cars_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: cars cars_slug_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cars
+    ADD CONSTRAINT cars_slug_unique UNIQUE (slug);
 
 
 --
@@ -454,6 +669,13 @@ ALTER TABLE ONLY public.settings
 
 
 --
+-- Name: cars_brand_idx; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX cars_brand_idx ON public.cars USING btree (brand_id);
+
+
+--
 -- Name: comments_post_status_idx; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -465,6 +687,14 @@ CREATE INDEX comments_post_status_idx ON public.comments USING btree (post_id, s
 --
 
 CREATE INDEX posts_status_published_at_idx ON public.posts USING btree (status, published_at);
+
+
+--
+-- Name: cars cars_brand_id_brands_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.cars
+    ADD CONSTRAINT cars_brand_id_brands_id_fk FOREIGN KEY (brand_id) REFERENCES public.brands(id) ON DELETE RESTRICT;
 
 
 --
@@ -511,5 +741,5 @@ ALTER TABLE ONLY public.post_related
 -- PostgreSQL database dump complete
 --
 
-\unrestrict mUqhVrJ93NU8MQO2iywpkWqgBGAJcexqnaZu9Kv9XlgDuZJTpb7LjcFI05GAnu7
+\unrestrict n6hZhyr17Kh74q641vAk5TuSgNnRj6CXqfd4Ve2BfQL8nF2xbanRrWaZdeVMt4I
 

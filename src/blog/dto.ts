@@ -18,10 +18,10 @@ import {
 } from 'class-validator';
 import { SLUG_MESSAGE, SLUG_PATTERN } from './content.js';
 
-const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
+export const trim = ({ value }: { value: unknown }) => (typeof value === 'string' ? value.trim() : value);
 
 // Relative paths (uploads) or absolute http(s) URLs
-const URL_PATTERN = /^(\/(?!\/)|https?:\/\/)/;
+export const URL_PATTERN = /^(\/(?!\/)|https?:\/\/)/;
 
 export class UpsertPostDto {
   @Transform(trim)

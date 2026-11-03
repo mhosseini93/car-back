@@ -1,4 +1,5 @@
 import {
+  bigint,
   boolean,
   index,
   integer,
@@ -103,4 +104,66 @@ export const comments = pgTable(
     createdAt: createdAt(),
   },
   (t) => [index('comments_post_status_idx').on(t.postId, t.status)],
+);
+
+// ---------------------------------------------------------------- Catalog
+
+export const carCondition = pgEnum('car_condition', ['new', 'used']);
+
+export type BrandFaq = { q: string; a: string };
+
+export const brands = pgTable('brands', {
+  id: serial('id').primaryKey(),
+  slug: text('slug').notNull().unique(),
+  name: text('name').notNull(),
+  englishName: text('english_name').notNull().default(''),
+  // Short text under the page heading and in listings
+  intro: text('intro').notNull().default(''),
+  // Sanitized HTML from the admin editor, shown below the car list
+  content: text('content').notNull().default(''),
+  logoUrl: text('logo_url'),
+  color: text('color').notNull().default('#1d4ed8'),
+  faqs: jsonb('faqs').$type<BrandFaq[]>().notNull().default([]),
+  // SEO
+  metaTitle: text('meta_title').notNull().default(''),
+  metaDescription: text('meta_description').notNull().default(''),
+  robotsIndex: boolean('robots_index').notNull().default(true),
+  robotsFollow: boolean('robots_follow').notNull().default(true),
+  isActive: boolean('is_active').notNull().default(true),
+  position: integer('position').notNull().default(0),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+export const cars = pgTable(
+  'cars',
+  {
+    id: serial('id').primaryKey(),
+    slug: text('slug').notNull().unique(),
+    // A brand with cars can't be deleted
+    brandId: integer('brand_id')
+      .notNull()
+      .references(() => brands.id, { onDelete: 'restrict' }),
+    name: text('name').notNull(),
+    year: integer('year').notNull(),
+    condition: carCondition('condition').notNull().default('new'),
+    mileage: integer('mileage').notNull().default(0),
+    // Cash price in toman
+    price: bigint('price', { mode: 'number' }).notNull(),
+    minDownPercent: integer('min_down_percent').notNull().default(30),
+    gearbox: text('gearbox').notNull().default('اتوماتیک'),
+    fuel: text('fuel').notNull().default('بنزین'),
+    // Body color for the illustration shown when there is no photo
+    color: text('color').notNull().default('#e5e7eb'),
+    imageUrl: text('image_url'),
+    imageAlt: text('image_alt').notNull().default(''),
+    tags: text('tags').array().notNull().default([]),
+    // Page views in the last 7 days, used to rank popular cars
+    weeklyViews: integer('weekly_views').notNull().default(0),
+    isActive: boolean('is_active').notNull().default(true),
+    position: integer('position').notNull().default(0),
+    createdAt: createdAt(),
+    updatedAt: updatedAt(),
+  },
+  (t) => [index('cars_brand_idx').on(t.brandId)],
 );

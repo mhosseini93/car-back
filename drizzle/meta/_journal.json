@@ -15,6 +15,20 @@
       "when": 1793638080455,
       "tag": "0001_blog",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793698738188,
+      "tag": "0002_catalog",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793698739677,
+      "tag": "0003_catalog_seed",
+      "breakpoints": true
     }
   ]
 }

@@ -48,3 +48,9 @@
 - `src/blog/`: مقالات، دسته‌بندی‌ها (چند به چند)، مقالات مرتبط (دستی + تکمیل خودکار از همان دسته)، دیدگاه‌ها (نیاز به تأیید، honeypot، ۳ دیدگاه در دقیقه) و آپلود تصویر (`POST /api/admin/uploads`، در پوشه `uploads/` که در گیت است).
 - HTML مقاله هنگام ذخیره با `sanitize-html` پاک‌سازی می‌شود (`src/blog/content.ts`).
 - مسیرهای عمومی: `/api/blog/...`؛ مدیریتی: `/api/admin/...` (همه با `AdminGuard`).
+
+## کاتالوگ (برندها و خودروها)
+- `src/catalog/`: جدول‌های `brands` و `cars` (هر خودرو یک برند دارد؛ برندی که خودرو دارد حذف نمی‌شود). قیمت‌ها به تومان در ستون bigint.
+- مسیرهای عمومی: `/api/catalog/brands`، `/api/catalog/brands/:slug` (با خودروهای فعال)، `/api/catalog/cars/popular`، `/api/catalog/sitemap`. فقط برند و خودروی فعال (`isActive`) نمایش داده می‌شود.
+- مدیریتی: `/api/admin/brands` و `/api/admin/cars` (همه با `AdminGuard`). متن معرفی برند هم با `sanitize-html` پاک‌سازی می‌شود.
+- داده‌های اولیه برندها و خودروها در مایگریشن `drizzle/0003_catalog_seed.sql` است.
