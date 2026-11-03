@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict lAU4Z5nrPZTKZ7PkIo4yW0ObJDOGBMjKPd7ihqmqWuMNkrIydqqdGscjfI6SDR3
+\restrict mUqhVrJ93NU8MQO2iywpkWqgBGAJcexqnaZu9Kv9XlgDuZJTpb7LjcFI05GAnu7
 
 -- Dumped from database version 18.6
 -- Dumped by pg_dump version 18.6
@@ -305,6 +305,8 @@ COPY drizzle.__drizzle_migrations (id, hash, created_at) FROM stdin;
 --
 
 COPY public.categories (id, slug, name, description, created_at) FROM stdin;
+4	راهنمای-خرید	راهنمای خرید		2026-11-03 11:07:24.627025+03:30
+5	اقساط-و-تسهیلات	اقساط و تسهیلات		2026-11-03 11:07:26.626379+03:30
 \.
 
 
@@ -321,6 +323,8 @@ COPY public.comments (id, post_id, author_name, author_email, content, status, c
 --
 
 COPY public.post_categories (post_id, category_id) FROM stdin;
+5	4
+5	5
 \.
 
 
@@ -337,6 +341,7 @@ COPY public.post_related (post_id, related_id, "position") FROM stdin;
 --
 
 COPY public.posts (id, slug, title, excerpt, content, cover_image_url, cover_image_alt, status, published_at, reading_minutes, meta_title, meta_description, canonical_url, robots_index, robots_follow, allow_comments, created_at, updated_at) FROM stdin;
+5	راهنمای-کامل-خرید-اقساطی-خودرو-بدون-ضامن	راهنمای کامل خرید اقساطی خودرو بدون ضامن	هر آنچه برای خرید اقساطی خودرو باید بدانید: مدارک لازم، پیش‌پرداخت، مدت بازپرداخت و نکاتی که قبل از امضای قرارداد باید بررسی کنید.	<h2>خرید اقساطی خودرو چیست؟</h2><p>در خرید اقساطی، بخشی از قیمت خودرو را به عنوان پیش‌پرداخت می‌پردازید و باقی مبلغ را در اقساط ماهانه تسویه می‌کنید. این روش برای کسانی مناسب است که نقدینگی کافی برای خرید نقدی ندارند اما درآمد ماهانه منظمی دارند.</p><h2>مدارک لازم برای خرید اقساطی</h2><ul><li><p>کارت ملی و شناسنامه</p></li><li><p>چک صیادی به نام خریدار</p></li><li><p>مدرک محل سکونت</p></li></ul><h2>مقایسه مدت بازپرداخت</h2><p><strong>نکته:</strong> هرچه مدت بازپرداخت طولانی‌تر باشد، قسط ماهانه کمتر و مجموع سود بیشتر می‌شود.</p><table><colgroup><col style="min-width:25px" /><col style="min-width:25px" /><col style="min-width:25px" /></colgroup><tbody><tr><th><p>مدت بازپرداخت</p></th><th><p>قسط ماهانه</p></th><th><p>مجموع سود</p></th></tr><tr><td><p>۱۲ ماه</p></td><td><p>بیشتر</p></td><td><p>کمتر</p></td></tr><tr><td><p>۴۸ ماه</p></td><td><p>کمتر</p></td><td><p>بیشتر</p></td></tr></tbody></table><h3>کدام مدت مناسب‌تر است؟</h3><p>اگر درآمد ثابتی دارید و می‌خواهید هزینه کل کمتر شود، مدت کوتاه‌تر بهتر است. اگر قسط ماهانه برایتان مهم‌تر است، مدت طولانی‌تر را انتخاب کنید.</p><h2>نکات مهم قبل از امضای قرارداد</h2><ol><li><p>مبلغ کل اقساط را با قیمت نقدی مقایسه کنید.</p></li><li><p>زمان دقیق تحویل خودرو را در قرارداد بنویسید.</p></li><li><p>شرایط تسویه زودتر از موعد را بپرسید.</p></li></ol><blockquote><p>قبل از پرداخت پیش‌پرداخت، همه بندهای قرارداد را با دقت بخوانید.</p></blockquote><p>برای دیدن خودروهای قابل خرید اقساطی، بخش <a href="/#popular">خودروهای پرمخاطب</a> را ببینید.</p>	\N		published	2026-11-03 11:07:36.017+03:30	1		راهنمای قدم‌به‌قدم خرید اقساطی خودرو بدون ضامن: مدارک لازم، مقایسه مدت بازپرداخت، پیش‌پرداخت و نکاتی که قبل از امضای قرارداد باید بدانید.		t	t	t	2026-11-03 11:07:36.019312+03:30	2026-11-03 11:11:40.629+03:30
 \.
 
 
@@ -359,21 +364,21 @@ SELECT pg_catalog.setval('drizzle.__drizzle_migrations_id_seq', 2, true);
 -- Name: categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.categories_id_seq', 3, true);
+SELECT pg_catalog.setval('public.categories_id_seq', 5, true);
 
 
 --
 -- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.comments_id_seq', 1, true);
+SELECT pg_catalog.setval('public.comments_id_seq', 2, true);
 
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.posts_id_seq', 4, true);
+SELECT pg_catalog.setval('public.posts_id_seq', 6, true);
 
 
 --
@@ -506,5 +511,5 @@ ALTER TABLE ONLY public.post_related
 -- PostgreSQL database dump complete
 --
 
-\unrestrict lAU4Z5nrPZTKZ7PkIo4yW0ObJDOGBMjKPd7ihqmqWuMNkrIydqqdGscjfI6SDR3
+\unrestrict mUqhVrJ93NU8MQO2iywpkWqgBGAJcexqnaZu9Kv9XlgDuZJTpb7LjcFI05GAnu7
 
