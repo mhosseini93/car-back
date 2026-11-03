@@ -111,6 +111,11 @@ export const comments = pgTable(
 export const carCondition = pgEnum('car_condition', ['new', 'used']);
 
 export type BrandFaq = { q: string; a: string };
+export type CarImage = { src: string; alt: string };
+// group: section title such as «سیستم ترمز»; null for ungrouped specs
+export type CarSpec = { group: string | null; label: string; value: string };
+// amount: monthly installment in toman
+export type CarInstallment = { months: number; amount: number };
 
 export const brands = pgTable('brands', {
   id: serial('id').primaryKey(),
@@ -157,6 +162,18 @@ export const cars = pgTable(
     color: text('color').notNull().default('#e5e7eb'),
     imageUrl: text('image_url'),
     imageAlt: text('image_alt').notNull().default(''),
+    gallery: jsonb('gallery').$type<CarImage[]>().notNull().default([]),
+    // Sanitized HTML description for the car page
+    content: text('content').notNull().default(''),
+    specs: jsonb('specs').$type<CarSpec[]>().notNull().default([]),
+    installments: jsonb('installments').$type<CarInstallment[]>().notNull().default([]),
+    // Page the car was imported from (scripts/import-catalog.mjs); matches rows on re-import
+    sourceUrl: text('source_url').unique(),
+    // SEO; empty meta fields fall back to text built from the car's data
+    metaTitle: text('meta_title').notNull().default(''),
+    metaDescription: text('meta_description').notNull().default(''),
+    robotsIndex: boolean('robots_index').notNull().default(true),
+    robotsFollow: boolean('robots_follow').notNull().default(true),
     tags: text('tags').array().notNull().default([]),
     // Page views in the last 7 days, used to rank popular cars
     weeklyViews: integer('weekly_views').notNull().default(0),

@@ -51,6 +51,9 @@
 
 ## کاتالوگ (برندها و خودروها)
 - `src/catalog/`: جدول‌های `brands` و `cars` (هر خودرو یک برند دارد؛ برندی که خودرو دارد حذف نمی‌شود). قیمت‌ها به تومان در ستون bigint.
-- مسیرهای عمومی: `/api/catalog/brands`، `/api/catalog/brands/:slug` (با خودروهای فعال)، `/api/catalog/cars/popular`، `/api/catalog/sitemap`. فقط برند و خودروی فعال (`isActive`) نمایش داده می‌شود.
+- مسیرهای عمومی: `/api/catalog/brands`، `/api/catalog/brands/:slug` (با خودروهای فعال)، `/api/catalog/cars/popular`، `/api/catalog/cars/:slug` (صفحه خودرو + ۴ خودروی مشابه: اول هم‌برند، بعد نزدیک‌ترین قیمت)، `/api/catalog/sitemap` (`{ brands, cars }`؛ فقط صفحات index). فقط برند و خودروی فعال (`isActive`) نمایش داده می‌شود.
 - مدیریتی: `/api/admin/brands` و `/api/admin/cars` (همه با `AdminGuard`). متن معرفی برند هم با `sanitize-html` پاک‌سازی می‌شود.
 - داده‌های اولیه برندها و خودروها در مایگریشن `drizzle/0003_catalog_seed.sql` است.
+- خودروها علاوه بر فیلدهای پایه، ستون‌های `content` (HTML پاک‌سازی‌شده)، `gallery`، `specs`، `installments` (jsonb) و `source_url` دارند.
+- سئوی صفحه خودرو: `meta_title`، `meta_description`، `robots_index`، `robots_follow` (مایگریشن `0005_car_seo`). `content` در ذخیره از پنل با `sanitizeContent` پاک‌سازی می‌شود. لیست‌ها (`carColumns`) هم `installments` را برمی‌گردانند تا کارت‌ها کمترین قسط واقعی را نشان دهند.
+- ورود/سینک داده از خروجی اسکرپر (`tools/scraper` در پروژه فرانت‌اند): `npm run catalog:import -- <file.json> [--dry-run]` (`scripts/import-catalog.mjs`). خودروها با `source_url` (و بعد نام) تطبیق داده می‌شوند و اجرای دوباره فقط قیمت، پیش‌پرداخت، مشخصات و اقساط را به‌روز می‌کند؛ متن، نام و سئوی ردیف‌های موجود دست نمی‌خورد. جمله‌ها و بلوک‌هایی که نام یا تلفن سایت مبدأ را دارند حذف می‌شوند (`SOURCE_MARKERS`).

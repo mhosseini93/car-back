@@ -29,6 +29,20 @@
       "when": 1793698739677,
       "tag": "0003_catalog_seed",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793715519480,
+      "tag": "0004_car_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793716316430,
+      "tag": "0005_car_seo",
+      "breakpoints": true
     }
   ]
 }

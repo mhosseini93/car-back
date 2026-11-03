@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { and, asc, count, desc, eq, ilike, or, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, desc, eq, ilike, ne, or, sql, type SQL } from 'drizzle-orm';
 import { sanitizeContent } from '../blog/content.js';
 import { DatabaseService } from '../database/database.service.js';
 import { brands, cars } from '../database/schema.js';
 import type { AdminCarsQueryDto, UpsertBrandDto, UpsertCarDto } from './dto.js';
 
 const POPULAR_COUNT = 8;
+const RELATED_COUNT = 4;
 
 const carColumns = {
   id: cars.id,
@@ -21,6 +22,8 @@ const carColumns = {
   color: cars.color,
   imageUrl: cars.imageUrl,
   imageAlt: cars.imageAlt,
+  // Small (a few plans); cards show the lowest monthly payment from it
+  installments: cars.installments,
   tags: cars.tags,
   weeklyViews: cars.weeklyViews,
   brand: { id: brands.id, slug: brands.slug, name: brands.name },
@@ -97,13 +100,48 @@ export class CatalogService {
       .limit(limit);
   }
 
-  // Indexable brand pages for sitemap.xml
-  sitemapBrands() {
-    return this.db
-      .select({ slug: brands.slug, updatedAt: brands.updatedAt })
-      .from(brands)
-      .where(and(eq(brands.isActive, true), eq(brands.robotsIndex, true)))
-      .orderBy(asc(brands.position));
+  async getCar(slug: string) {
+    const [row] = await this.db
+      .select({
+        car: cars,
+        brand: { id: brands.id, slug: brands.slug, name: brands.name, color: brands.color, logoUrl: brands.logoUrl },
+      })
+      .from(cars)
+      .innerJoin(brands, eq(brands.id, cars.brandId))
+      .where(and(eq(cars.slug, slug), isPublicCar()))
+      .limit(1);
+    if (!row) throw new NotFoundException('خودرو پیدا نشد');
+
+    const { sourceUrl: _source, isActive: _active, position: _position, brandId, ...car } = row.car;
+
+    // Same-brand cars first, then the closest in price
+    const related = await this.db
+      .select(carColumns)
+      .from(cars)
+      .innerJoin(brands, eq(brands.id, cars.brandId))
+      .where(and(isPublicCar(), ne(cars.id, car.id)))
+      .orderBy(sql`${cars.brandId} <> ${brandId}`, sql`abs(${cars.price} - ${car.price})`)
+      .limit(RELATED_COUNT);
+
+    return { ...car, brand: row.brand, related };
+  }
+
+  // Indexable brand and car pages for sitemap.xml
+  async sitemap() {
+    const [brandRows, carRows] = await Promise.all([
+      this.db
+        .select({ slug: brands.slug, updatedAt: brands.updatedAt })
+        .from(brands)
+        .where(and(eq(brands.isActive, true), eq(brands.robotsIndex, true)))
+        .orderBy(asc(brands.position)),
+      this.db
+        .select({ slug: cars.slug, updatedAt: cars.updatedAt })
+        .from(cars)
+        .innerJoin(brands, eq(brands.id, cars.brandId))
+        .where(and(isPublicCar(), eq(cars.robotsIndex, true)))
+        .orderBy(asc(brands.position), asc(cars.position), asc(cars.id)),
+    ]);
+    return { brands: brandRows, cars: carRows };
   }
 
   // ------------------------------------------------------------ Admin
@@ -194,6 +232,8 @@ export class CatalogService {
     const values = {
       ...dto,
       imageUrl: dto.imageUrl || null,
+      content: sanitizeContent(dto.content),
+      specs: dto.specs.map((spec) => ({ ...spec, group: spec.group || null })),
       // Used cars always have a mileage; new ones never do
       mileage: dto.condition === 'new' ? 0 : dto.mileage,
       tags: [...new Set(dto.tags.map((t) => t.trim()).filter(Boolean))],

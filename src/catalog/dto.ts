@@ -101,6 +101,51 @@ export class UpsertBrandDto {
   position!: number;
 }
 
+export class CarImageDto {
+  @Transform(trim)
+  @IsString()
+  @Matches(URL_PATTERN, { message: 'آدرس تصویر گالری معتبر نیست' })
+  @MaxLength(500)
+  src!: string;
+
+  @Transform(trim)
+  @IsString()
+  @MaxLength(200, { message: 'متن جایگزین تصویر حداکثر ۲۰۰ کاراکتر است' })
+  alt!: string;
+}
+
+export class CarSpecDto {
+  @IsOptional()
+  @Transform(trim)
+  @IsString()
+  @MaxLength(60, { message: 'عنوان گروه مشخصات حداکثر ۶۰ کاراکتر است' })
+  group!: string | null;
+
+  @Transform(trim)
+  @IsString()
+  @IsNotEmpty({ message: 'عنوان هر مشخصه را وارد کنید' })
+  @MaxLength(80, { message: 'عنوان مشخصه حداکثر ۸۰ کاراکتر است' })
+  label!: string;
+
+  @Transform(trim)
+  @IsString()
+  @IsNotEmpty({ message: 'مقدار هر مشخصه را وارد کنید' })
+  @MaxLength(200, { message: 'مقدار مشخصه حداکثر ۲۰۰ کاراکتر است' })
+  value!: string;
+}
+
+export class CarInstallmentDto {
+  @IsInt({ message: 'تعداد ماه‌های قسط باید عدد صحیح باشد' })
+  @Min(1, { message: 'تعداد ماه‌های قسط بین ۱ تا ۱۲۰ است' })
+  @Max(120, { message: 'تعداد ماه‌های قسط بین ۱ تا ۱۲۰ است' })
+  months!: number;
+
+  @IsInt({ message: 'مبلغ قسط باید عدد صحیح (تومان) باشد' })
+  @Min(1, { message: 'مبلغ قسط را وارد کنید' })
+  @Max(100_000_000_000)
+  amount!: number;
+}
+
 export class UpsertCarDto {
   @Transform(trim)
   @IsString()
@@ -167,6 +212,44 @@ export class UpsertCarDto {
   @IsString()
   @MaxLength(200, { message: 'متن جایگزین تصویر حداکثر ۲۰۰ کاراکتر است' })
   imageAlt!: string;
+
+  @IsArray()
+  @ArrayMaxSize(20, { message: 'حداکثر ۲۰ تصویر در گالری' })
+  @ValidateNested({ each: true })
+  @Type(() => CarImageDto)
+  gallery!: CarImageDto[];
+
+  @IsString()
+  @MaxLength(200_000, { message: 'توضیحات خودرو بیش از حد طولانی است' })
+  content!: string;
+
+  @IsArray()
+  @ArrayMaxSize(150, { message: 'حداکثر ۱۵۰ مشخصه فنی' })
+  @ValidateNested({ each: true })
+  @Type(() => CarSpecDto)
+  specs!: CarSpecDto[];
+
+  @IsArray()
+  @ArrayMaxSize(24, { message: 'حداکثر ۲۴ طرح اقساط' })
+  @ValidateNested({ each: true })
+  @Type(() => CarInstallmentDto)
+  installments!: CarInstallmentDto[];
+
+  @Transform(trim)
+  @IsString()
+  @MaxLength(70, { message: 'عنوان سئو حداکثر ۷۰ کاراکتر است' })
+  metaTitle!: string;
+
+  @Transform(trim)
+  @IsString()
+  @MaxLength(170, { message: 'توضیحات متا حداکثر ۱۷۰ کاراکتر است' })
+  metaDescription!: string;
+
+  @IsBoolean()
+  robotsIndex!: boolean;
+
+  @IsBoolean()
+  robotsFollow!: boolean;
 
   @IsArray()
   @ArrayMaxSize(5, { message: 'حداکثر ۵ برچسب' })

@@ -22,8 +22,13 @@ export class CatalogController {
     return this.catalog.popularCars(query.limit);
   }
 
+  @Get('cars/:slug')
+  getCar(@Param('slug') slug: string) {
+    return this.catalog.getCar(slug);
+  }
+
   @Get('sitemap')
   sitemap() {
-    return this.catalog.sitemapBrands();
+    return this.catalog.sitemap();
   }
 }
