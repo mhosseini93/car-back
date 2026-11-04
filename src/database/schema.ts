@@ -186,3 +186,23 @@ export const cars = pgTable(
   },
   (t) => [index('cars_brand_idx').on(t.brandId)],
 );
+
+// ---------------------------------------------------------------- Contact
+
+export const contactSubject = pgEnum('contact_subject', ['purchase', 'installment', 'support', 'other']);
+
+// Messages sent from the site's contact page
+export const contactMessages = pgTable(
+  'contact_messages',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    phone: text('phone').notNull(),
+    email: text('email').notNull().default(''),
+    subject: contactSubject('subject').notNull().default('other'),
+    message: text('message').notNull(),
+    isRead: boolean('is_read').notNull().default(false),
+    createdAt: createdAt(),
+  },
+  (t) => [index('contact_messages_read_idx').on(t.isRead, t.createdAt)],
+);

@@ -5,6 +5,7 @@ import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { BlogModule } from './blog/blog.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
+import { ContactModule } from './contact/contact.module.js';
 import { DatabaseModule } from './database/database.module.js';
 import { SettingsModule } from './settings/settings.module.js';
 
@@ -16,6 +17,7 @@ import { SettingsModule } from './settings/settings.module.js';
     SettingsModule,
     BlogModule,
     CatalogModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],

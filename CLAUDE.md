@@ -57,3 +57,7 @@
 - خودروها علاوه بر فیلدهای پایه، ستون‌های `content` (HTML پاک‌سازی‌شده)، `gallery`، `specs`، `installments` (jsonb) و `source_url` دارند.
 - سئوی صفحه خودرو: `meta_title`، `meta_description`، `robots_index`، `robots_follow` (مایگریشن `0005_car_seo`). `content` در ذخیره از پنل با `sanitizeContent` پاک‌سازی می‌شود. لیست‌ها (`carColumns`) هم `installments` را برمی‌گردانند تا کارت‌ها کمترین قسط واقعی را نشان دهند.
 - ورود/سینک داده از خروجی اسکرپر (`tools/scraper` در پروژه فرانت‌اند): `npm run catalog:import -- <file.json> [--dry-run]` (`scripts/import-catalog.mjs`). خودروها با `source_url` (و بعد نام) تطبیق داده می‌شوند و اجرای دوباره فقط قیمت، پیش‌پرداخت، مشخصات و اقساط را به‌روز می‌کند؛ متن، نام و سئوی ردیف‌های موجود دست نمی‌خورد. جمله‌ها و بلوک‌هایی که نام یا تلفن سایت مبدأ را دارند حذف می‌شوند (`SOURCE_MARKERS`).
+
+## پیام‌های تماس
+- `src/contact/`: جدول `contact_messages` (نام، موبایل، ایمیل اختیاری، موضوع از enum `contact_subject`، متن، `is_read`). شماره موبایل با ارقام فارسی/عربی هم پذیرفته و به ارقام لاتین تبدیل می‌شود.
+- عمومی: `POST /api/contact` (honeypot `website` + `ThrottlerGuard` با ۳ پیام در دقیقه). مدیریتی: `GET/PATCH/DELETE /api/admin/contact` (با `AdminGuard`).
