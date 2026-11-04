@@ -1,5 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { and, asc, count, desc, eq, ilike, ne, or, sql, type SQL } from 'drizzle-orm';
+import { and, asc, count, eq, ilike, ne, or, sql, type SQL } from 'drizzle-orm';
 import { sanitizeContent } from '../blog/content.js';
 import { DatabaseService } from '../database/database.service.js';
 import { brands, cars } from '../database/schema.js';
@@ -25,7 +25,6 @@ const carColumns = {
   // Small (a few plans); cards show the lowest monthly payment from it
   installments: cars.installments,
   tags: cars.tags,
-  weeklyViews: cars.weeklyViews,
   brand: { id: brands.id, slug: brands.slug, name: brands.name },
 };
 
@@ -62,6 +61,7 @@ export class CatalogService {
         intro: brands.intro,
         logoUrl: brands.logoUrl,
         color: brands.color,
+        showOnHome: brands.showOnHome,
         carCount: sql<number>`count(${cars.id})::int`,
       })
       .from(brands)
@@ -95,8 +95,8 @@ export class CatalogService {
       .select(carColumns)
       .from(cars)
       .innerJoin(brands, eq(brands.id, cars.brandId))
-      .where(isPublicCar())
-      .orderBy(desc(cars.weeklyViews), asc(cars.id))
+      .where(and(isPublicCar(), eq(cars.showOnHome, true)))
+      .orderBy(asc(cars.position), asc(cars.id))
       .limit(limit);
   }
 
@@ -155,6 +155,7 @@ export class CatalogService {
         logoUrl: brands.logoUrl,
         color: brands.color,
         isActive: brands.isActive,
+        showOnHome: brands.showOnHome,
         robotsIndex: brands.robotsIndex,
         robotsFollow: brands.robotsFollow,
         position: brands.position,
@@ -215,7 +216,7 @@ export class CatalogService {
     }
 
     return this.db
-      .select({ ...carColumns, isActive: cars.isActive, position: cars.position, updatedAt: cars.updatedAt })
+      .select({ ...carColumns, isActive: cars.isActive, showOnHome: cars.showOnHome, position: cars.position, updatedAt: cars.updatedAt })
       .from(cars)
       .innerJoin(brands, eq(brands.id, cars.brandId))
       .where(conditions.length ? and(...conditions) : undefined)

@@ -43,6 +43,27 @@
       "when": 1793716316430,
       "tag": "0005_car_seo",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793774543179,
+      "tag": "0006_brand_show_on_home",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1793778252441,
+      "tag": "0007_car_show_on_home",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793778256411,
+      "tag": "0008_drop_car_weekly_views",
+      "breakpoints": true
     }
   ]
 }

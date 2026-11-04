@@ -135,6 +135,8 @@ export const brands = pgTable('brands', {
   robotsIndex: boolean('robots_index').notNull().default(true),
   robotsFollow: boolean('robots_follow').notNull().default(true),
   isActive: boolean('is_active').notNull().default(true),
+  // Listed in the brands section of the homepage
+  showOnHome: boolean('show_on_home').notNull().default(false),
   position: integer('position').notNull().default(0),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
@@ -175,8 +177,8 @@ export const cars = pgTable(
     robotsIndex: boolean('robots_index').notNull().default(true),
     robotsFollow: boolean('robots_follow').notNull().default(true),
     tags: text('tags').array().notNull().default([]),
-    // Page views in the last 7 days, used to rank popular cars
-    weeklyViews: integer('weekly_views').notNull().default(0),
+    // Listed in «پرمخاطب‌ترین خودروها» on the homepage
+    showOnHome: boolean('show_on_home').notNull().default(false),
     isActive: boolean('is_active').notNull().default(true),
     position: integer('position').notNull().default(0),
     createdAt: createdAt(),

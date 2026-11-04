@@ -51,7 +51,7 @@
 
 ## کاتالوگ (برندها و خودروها)
 - `src/catalog/`: جدول‌های `brands` و `cars` (هر خودرو یک برند دارد؛ برندی که خودرو دارد حذف نمی‌شود). قیمت‌ها به تومان در ستون bigint.
-- مسیرهای عمومی: `/api/catalog/brands`، `/api/catalog/brands/:slug` (با خودروهای فعال)، `/api/catalog/cars/popular`، `/api/catalog/cars/:slug` (صفحه خودرو + ۴ خودروی مشابه: اول هم‌برند، بعد نزدیک‌ترین قیمت)، `/api/catalog/sitemap` (`{ brands, cars }`؛ فقط صفحات index). فقط برند و خودروی فعال (`isActive`) نمایش داده می‌شود.
+- مسیرهای عمومی: `/api/catalog/brands`، `/api/catalog/brands/:slug` (با خودروهای فعال)، `/api/catalog/cars/popular` (خودروهایی با `show_on_home` روشن، به ترتیب `position`)، `/api/catalog/cars/:slug` (صفحه خودرو + ۴ خودروی مشابه: اول هم‌برند، بعد نزدیک‌ترین قیمت)، `/api/catalog/sitemap` (`{ brands, cars }`؛ فقط صفحات index). فقط برند و خودروی فعال (`isActive`) نمایش داده می‌شود.
 - مدیریتی: `/api/admin/brands` و `/api/admin/cars` (همه با `AdminGuard`). متن معرفی برند هم با `sanitize-html` پاک‌سازی می‌شود.
 - داده‌های اولیه برندها و خودروها در مایگریشن `drizzle/0003_catalog_seed.sql` است.
 - خودروها علاوه بر فیلدهای پایه، ستون‌های `content` (HTML پاک‌سازی‌شده)، `gallery`، `specs`، `installments` (jsonb) و `source_url` دارند.

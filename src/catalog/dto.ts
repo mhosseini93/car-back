@@ -95,6 +95,9 @@ export class UpsertBrandDto {
   @IsBoolean()
   isActive!: boolean;
 
+  @IsBoolean()
+  showOnHome!: boolean;
+
   @IsInt({ message: 'ترتیب نمایش باید عدد صحیح باشد' })
   @Min(0)
   @Max(10_000)
@@ -257,10 +260,8 @@ export class UpsertCarDto {
   @MaxLength(30, { each: true, message: 'هر برچسب حداکثر ۳۰ کاراکتر است' })
   tags!: string[];
 
-  @IsInt({ message: 'تعداد بازدید باید عدد باشد' })
-  @Min(0)
-  @Max(100_000_000)
-  weeklyViews!: number;
+  @IsBoolean()
+  showOnHome!: boolean;
 
   @IsBoolean()
   isActive!: boolean;
